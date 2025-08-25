@@ -123,7 +123,7 @@ const registerSocketEvent = () => {
 }
 
 .button-exit {
-  color: #000;
+  color: white;
   margin-top: 8px;
 }
 </style>
