@@ -5,13 +5,20 @@ const messages = [];
 /** @type {Task[]} */
 let tasks = [];
 
+const colors = [
+  "#C81717",
+  "#FF9A00",
+  "#008E74",
+  "#33078A",
+  "#67078A"
+];
 
 export default (io, socket) => {
   // 入室メッセージをクライアントに送信する
   socket.on("enterEvent", (data) => {
     // 同じ名前の人が入室したらUsersから検索して返す
     /** @type {User} */
-    let enterUser = users.find(user=>user.getName()===data.name)[0];
+    let enterUser = users.find(user=>user.getName()===data.name);
     if(typeof enterUser === "undefined"){
       enterUser = new User(data.name)
       users.push(enterUser)
@@ -116,15 +123,16 @@ class Message {
   #id;
   /** @type {string} メッセージ本文 */
   #message;
-  /** @type {number} ユーザーID */
-  #userId;
+  /** @type {User} ユーザー */
+  #user;
   /** @type {string} 送信時刻 Vue.js側で設定 */
   #sendAt;
 
   constructor(message, userId, sendAt) {
     this.#id = nowMessageId++;
     this.#message = message;
-    this.#userId = userId;
+    
+    this.#user = userId;
     this.#sendAt = sendAt;
   }
 
@@ -133,7 +141,7 @@ class Message {
     return {
       id: this.#id,
       message: this.#message,
-      userId: this.#userId,
+      user: this.#user,
       sendAt: this.#sendAt
     };
   }
