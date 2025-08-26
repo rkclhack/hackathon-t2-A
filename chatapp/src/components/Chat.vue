@@ -140,6 +140,18 @@ const registerSocketEvent = () => {
     </div>
 
     <div class="gantt-chart-container">
+      <!-- デバッグ用表示 -->
+      <div class="debug-panel">
+        <h3>Debug Info</h3>
+        <div class="debug-section">
+          <h4>Users ({{ users.length }})</h4>
+          <pre class="debug-json">{{ JSON.stringify(users, null, 2) }}</pre>
+        </div>
+        <div class="debug-section">
+          <h4>Messages ({{ messages.length }})</h4>
+          <pre class="debug-json">{{ JSON.stringify(messages, null, 2) }}</pre>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -263,5 +275,43 @@ const registerSocketEvent = () => {
 .button-exit {
   color: white;
   margin-top: 8px;
+}
+
+.debug-panel {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+  font-family: monospace;
+}
+
+.debug-panel h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 18px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+}
+
+.debug-section {
+  margin-bottom: 24px;
+}
+
+.debug-section h4 {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.debug-json {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>
