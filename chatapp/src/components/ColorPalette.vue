@@ -43,9 +43,9 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const sizeMap = {
-  sm: { w: 36, h: 28, radius: 8 },
-  md: { w: 48, h: 38, radius: 10 },
-  lg: { w: 64, h: 48, radius: 12 }
+  sm: { w: 36, h: 24, radius: 8 },
+  md: { w: 48, h: 34, radius: 10 },
+  lg: { w: 64, h: 44, radius: 12 }
 }
 
 const sizeConf = computed(() => sizeMap[props.size] ?? sizeMap.md)
@@ -62,12 +62,11 @@ function select(hex) {
 
 <style scoped>
 .cp-root {
-  padding-top: 20px;
-  padding-left: 10px;
-  padding-right: 10px;
   display: inline-flex;
   gap: 8px;
-  border: 2px solid #000;
+  position: absolute;
+  right: 0;
+  z-index: 9999;
 }
 
 .cp-swatch {
@@ -86,19 +85,19 @@ function select(hex) {
 
 .cp-sm { 
   width: 36px; 
-  height: 28px; 
+  height: 24px; 
   border-radius: 8px; 
 }
 
 .cp-md { 
   width: 48px; 
-  height: 38px; 
+  height: 34px; 
   border-radius: 10px; 
 }
 
 .cp-lg { 
   width: 64px; 
-  height: 48px; 
+  height: 44px; 
   border-radius: 12px; 
 }
 

@@ -3,6 +3,7 @@ import { onUnmounted, computed, toRef } from 'vue'
 import { useGantt } from '../composables/useGantt.js'
 import { useColorPallet } from '../composables/useUI.js'
 import { GANTT_CONFIG, GANTT_LAYOUT } from '../constants/gantt.js'
+import ColorPalette from './ColorPalette.vue'
 
 const props = defineProps({
   tasks: {
@@ -89,7 +90,8 @@ onUnmounted(() => {
                 :class="{ 
                   'task-completed': task.isDone,
                   'task-start': day === task.startDate,
-                  'task-end': day === task.startDate + task.duration - 1
+                  'task-end': day === task.startDate + task.duration - 1,
+                  'palette-open': activeColorPicker === task.messageId
                 }"
                 :style="{
                   backgroundColor: task.assignee.color
@@ -138,17 +140,14 @@ onUnmounted(() => {
                   </button>
                   <div
                     v-if="activeColorPicker === task.messageId"
-                    class="color-picker-palette"
+                    class="color-picker-palette floating-palette"
                   >
-                    <button
-                      v-for="(color, colorIndex) in colorPallet"
-                      :key="colorIndex"
-                      @click.stop="changeTaskColor(task.messageId, color)"
-                      @mousedown.stop.prevent
-                      class="color-option"
-                      :class="task.assignee.color === color ? 'color-selected' : ''"
-                      :style="{ backgroundColor: color }"
-                    ></button>
+                    <ColorPalette
+                      :colors="colorPallet"
+                      :model-value="task.assignee.color"
+                      @update:model-value="(color) => changeTaskColor(task.messageId, color)"
+                      size="sm"
+                    />
                   </div>
                 </div>
 
@@ -163,6 +162,8 @@ onUnmounted(() => {
               </div>
             </div>
           </div>
+
+
         </div>
 
         <div v-if="tasks.length === 0" class="drop-zone">
@@ -216,7 +217,7 @@ onUnmounted(() => {
   height: 100%;
   position: relative;
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: hidden;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -256,7 +257,40 @@ onUnmounted(() => {
 .tasks-container {
   display: flex;
   flex-direction: column;
+  position: relative;
 }
+
+.tasks-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tasks-container::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25px;
+  display: grid;
+  grid-template-columns: 75px repeat(7, minmax(120px, 1fr));
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tasks-container::before::after {
+  content: '';
+  border-right: 1px dashed #ddd;
+  height: 100%;
+}
+
+
 
 .task-row {
   width: 100%;
@@ -264,6 +298,14 @@ onUnmounted(() => {
   grid-template-columns: 75px repeat(7, minmax(120px, 1fr));
   height: 70px;
   margin-bottom: 5px;
+}
+
+.task-row:first-child {
+  margin-top: 20px;
+}
+
+.task-row:last-child {
+  margin-bottom: 25px;
 }
 
 .task-checkbox-cell {
@@ -291,6 +333,15 @@ onUnmounted(() => {
   z-index: 5;
 }
 
+.task-row:first-child .task-checkbox-cell::after {
+  top: -20px;
+  height: calc(100% + 20px);
+}
+
+.task-row:last-child .task-checkbox-cell::after {
+  height: calc(100% + 25px);
+}
+
 .day-cell {
   position: relative;
   height: 100%;
@@ -316,6 +367,15 @@ onUnmounted(() => {
   z-index: 5;
 }
 
+.task-row:first-child .day-cell:not(:last-child)::after {
+  top: -20px;
+  height: calc(100% + 20px);
+}
+
+.task-row:last-child .day-cell:not(:last-child)::after {
+  height: calc(100% + 25px);
+}
+
 .task-bar-segment {
   height: 48px;
   display: flex;
@@ -330,6 +390,10 @@ onUnmounted(() => {
   margin: 11px 0;
 }
 
+.task-bar-segment.palette-open {
+  z-index: 10000;
+}
+
 .task-bar-segment.task-start {
   border-top-left-radius: 16px;
   border-bottom-left-radius: 16px;
@@ -341,7 +405,7 @@ onUnmounted(() => {
 }
 
 .task-bar-segment.task-start.task-end {
-  border-radius: 4px;
+  border-radius: 16px;
 }
 
 .task-bar-segment.task-completed {
@@ -467,35 +531,6 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
-.color-picker-palette {
-  position: absolute;
-  top: 30px;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
-  z-index: 9999;
-  display: flex;
-  gap: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.color-option {
-  width: 20px;
-  height: 20px;
-  border-radius: 3px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-}
-
-.color-selected {
-  border-color: #333;
-  box-shadow: 0 0 0 1px #007bff;
-}
-
-
-
 .resize-handle {
   position: absolute;
   right: 6px;
@@ -567,5 +602,32 @@ onUnmounted(() => {
 @keyframes bounce {
   0%, 100% { transform: translateX(0); }
   50% { transform: translateX(-5px); }
+}
+
+.color-picker-palette {
+  position: absolute;
+  top: 25px;
+  bottom: 30px;
+  right: 0;
+  z-index: 9999;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  overflow: hidden;
+}
+
+.floating-palette {
+  border: none !important;
+  border-radius: 8px;
+  overflow: visible;
+  z-index: 9999;
+}
+
+.floating-palette :deep(.cp-root) {
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 8px 12px 12px 12px;
+  background: white;
 }
 </style>
