@@ -40,7 +40,7 @@ const onEnter = () => {
 
 <template>
   <Header />
-  <img src="../images/chat-screen.png"></img>
+  <img src="../images/chat-screen.png" class="chat-screen"></img>
   <div class="container">
     <div>
     <h1 class="title">アプリ名</h1>
@@ -60,14 +60,14 @@ p{
   margin-bottom: 10px;
 }
 
-img{
+.chat-screen{
   position: fixed;     
   top: 0;
   left: 0;
   width: 100vw;        
   height: 100vh;        
   object-fit: cover;   
-  opacity: 0.5;         
+  opacity: 0.4;         
   z-index: -1;          
   user-select: none;
   pointer-events: none;
@@ -88,6 +88,7 @@ img{
   margin-bottom: 10px;
 }
 .subtitle{
+  font-size: 20px;
   margin-bottom: 50px;
 }
 
@@ -97,10 +98,11 @@ img{
   width: 400px;
   height: 30px;
   border: 1px solid #888;
-  border-radius: 4px;
+  border-radius: 10px;
   margin-bottom: 16px;
   padding-left: 12px;
   font-size: 16px;
+  text-align: center;
 }
 .user-name-text:focus{
   outline: 1px solid #33078A;
@@ -113,9 +115,10 @@ img{
   color:#33078A;
   background-color: white;
   border: 1px solid #33078A;
-  border-radius: 4px;
-  font-size: 18px;
-  font-style: "Instrument Sans";
+  border-radius: 10px;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  
 }
 .send_alt_button:hover{
   background-color: #33078A;
