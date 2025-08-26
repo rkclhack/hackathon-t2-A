@@ -2,6 +2,7 @@
 import { inject, ref } from "vue"
 import { useRouter } from "vue-router"
 import socketManager from '../socketManager.js'
+import Header from './Header.vue'
 
 // #region global state
 const userName = inject("userName")
@@ -38,13 +39,16 @@ const onEnter = () => {
 </script>
 
 <template>
-  <div class="mx-auto my-5 px-4">
-    <h1 class="text-h3 font-weight-medium">Vue.js Chat サンプル</h1>
-    <div class="mt-10">
-      <p>ユーザー名</p>
-      <input type="text" v-model="inputUserName" class="user-name-text" />
+  <div>
+    <Header />
+    <div class="mx-auto my-5 px-4">
+      <h1 class="text-h3 font-weight-medium">Vue.js Chat サンプル</h1>
+      <div class="mt-10">
+        <p>ユーザー名</p>
+        <input type="text" v-model="inputUserName" class="user-name-text" />
+      </div>
+      <button type="button" @click="onEnter" class="button-normal">入室する</button>
     </div>
-    <button type="button" @click="onEnter" class="button-normal">入室する</button>
   </div>
 </template>
 
