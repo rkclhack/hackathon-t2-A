@@ -24,6 +24,12 @@ export default (io, socket) => {
       users.push(enterUser)
     }
     console.log(JSON.stringify(users));
+    
+    // 入室したユーザーに既存のデータを送信
+    socket.emit("enterEvent", users)
+    socket.emit("publishEvent", messages)
+    
+    // 他のユーザーにユーザー情報を送信
     socket.broadcast.emit("enterEvent", users)
   })
 

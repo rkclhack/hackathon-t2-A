@@ -15,39 +15,18 @@ const socket = socketManager.getInstance()
 // #region reactive variable
 const chatContent = ref("")
 const chatList = reactive([])
+const users = reactive([])
+const messages = reactive([])
 const isSendDisable = computed(() => {
   return chatContent.value.trim() === "";
 });
-
-// ダミーデータ（UI確認用）
-const dummyMessages = [
-  {
-    id: 1,
-    userName: "田中太郎",
-    message: "こんにちは！今日は良い天気ですね。",
-    sendAt: "14:30",
-    color: "#FF6B6B"
-  },
-  {
-    id: 2,
-    userName: userName.value || "自分",
-    message: "はい、本当に良い天気です！",
-    sendAt: "14:31",
-    color: "#4ECDC4"
-  },
-  {
-    id: 3,
-    userName: "佐藤花子",
-    message: "明日も晴れるといいですね。",
-    sendAt: "14:32",
-    color: "#45B7D1"
-  }
-]
 // #endregion
 
 // #region lifecycle
 onMounted(() => {
   registerSocketEvent()
+  // 入室時にサーバーに通知してデータを同期
+  socket.emit("enterEvent", { name: userName.value })
 })
 // #endregion
 
@@ -57,7 +36,13 @@ const onPublish = () => {
   if (isSendDisable.value) {
     return;
   }
-  socket.emit("publishEvent", { name: userName.value, message: chatContent.value })
+  const now = new Date()
+  const sendAt = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`
+  socket.emit("publishEvent", { 
+    name: userName.value, 
+    message: chatContent.value, 
+    sendAt: sendAt 
+  })
   // 入力欄を初期化
   chatContent.value = ""
 }
@@ -78,10 +63,9 @@ const onMemo = () => {
 // #endregion
 
 // #region socket event handler
-// サーバから受信した入室メッセージ画面上に表示する
+// サーバから受信したユーザー情報を更新する
 const onReceiveEnter = (data) => {
-  const message = `${data.name}さんが入室しました。`
-  chatList.unshift(message)
+  users.splice(0, users.length, ...data)
 }
 
 // サーバから受信した退室メッセージを受け取り画面上に表示する
@@ -90,10 +74,9 @@ const onReceiveExit = (data) => {
   chatList.unshift(message)
 }
 
-// サーバから受信した投稿メッセージを画面上に表示する
+// サーバから受信したメッセージ配列を更新する
 const onReceivePublish = (data) => {
-  const message = `${data.name}さん:${data.message}`
-  chatList.unshift(message)
+  messages.splice(0, messages.length, ...data)
 }
 // #endregion
 
@@ -123,18 +106,26 @@ const registerSocketEvent = () => {
   <div class="app-layout">
     <div class="chat-container">
       <div class="message-display">
-        <!-- UI確認用のダミーメッセージ -->
         <div class="mt-5">
           <div class="messages-list">
-            <div v-for="message in dummyMessages" :key="message.id"
-              :class="message.userName === (userName || '自分') ? 'message-wrapper mine' : 'message-wrapper theirs'">
-              <MessageCard :message="message" :mine="message.userName === (userName || '自分')" />
+            <div v-for="message in messages" :key="message.id"
+              :class="message.user.name === userName ? 'message-wrapper mine' : 'message-wrapper theirs'">
+              <MessageCard 
+                :message="{
+                  id: message.id,
+                  userName: message.user.name,
+                  message: message.message,
+                  sendAt: message.sendAt,
+                  color: message.user.color
+                }" 
+                :mine="message.user.name === userName" 
+              />
             </div>
           </div>
         </div>
 
-        <!-- 実際のチャットメッセージ（現在は非表示） -->
-        <div class="mt-5" v-if="chatList.length !== 0" style="display: none;">
+        <!-- システムメッセージ（入退室など） -->
+        <div class="mt-5" v-if="chatList.length !== 0">
           <ul>
             <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
           </ul>
