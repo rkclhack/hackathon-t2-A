@@ -66,7 +66,7 @@ export default (io, socket) => {
  * @returns {string}
  */
 function userNameToId(name){
-  users.find(user => user.getName() === name);
+  const user = users.find(user => user.getName() === name);
   return user.getId();
 }
 

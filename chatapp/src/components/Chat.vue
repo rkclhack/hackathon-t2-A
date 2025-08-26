@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref, reactive, onMounted } from "vue"
+import { inject, ref, reactive, onMounted, computed } from "vue"
 import socketManager from '../socketManager.js'
 import Header from './Header.vue'
 import MessageCard from './MessageCard.vue'
@@ -15,6 +15,9 @@ const socket = socketManager.getInstance()
 // #region reactive variable
 const chatContent = ref("")
 const chatList = reactive([])
+const isSendDisable = computed(() => {
+  return chatContent.value.trim() === "";
+});
 
 // ダミーデータ（UI確認用）
 const dummyMessages = [
@@ -51,6 +54,9 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
+  if (isSendDisable.value) {
+    return;
+  }
   socket.emit("publishEvent", { name: userName.value, message: chatContent.value })
   // 入力欄を初期化
   chatContent.value = ""
@@ -120,19 +126,13 @@ const registerSocketEvent = () => {
         <!-- UI確認用のダミーメッセージ -->
         <div class="mt-5">
           <div class="messages-list">
-            <div 
-              v-for="message in dummyMessages" 
-              :key="message.id"
-              :class="message.userName === (userName || '自分') ? 'message-wrapper mine' : 'message-wrapper theirs'"
-            >
-              <MessageCard 
-                :message="message"
-                :mine="message.userName === (userName || '自分')"
-              />
+            <div v-for="message in dummyMessages" :key="message.id"
+              :class="message.userName === (userName || '自分') ? 'message-wrapper mine' : 'message-wrapper theirs'">
+              <MessageCard :message="message" :mine="message.userName === (userName || '自分')" />
             </div>
           </div>
         </div>
-        
+
         <!-- 実際のチャットメッセージ（現在は非表示） -->
         <div class="mt-5" v-if="chatList.length !== 0" style="display: none;">
           <ul>
@@ -143,7 +143,8 @@ const registerSocketEvent = () => {
       <div class="message-input">
         <textarea v-model="chatContent" placeholder="Type a message" class="message-textarea">
         </textarea>
-        <button class="submit-button" @click="onPublish">投稿</button>
+        <img src="../images/sendIcon.svg" class="send-icon" :class="{ 'disable': isSendDisable }" @click="onPublish">
+        </img>
       </div>
     </div>
 
@@ -226,8 +227,21 @@ const registerSocketEvent = () => {
   outline-color: #584B73;
 }
 
-.submit-button {
+.send-icon {
+  cursor: pointer;
   flex: 1;
+  transform: scale(0.8);
+}
+
+.send-icon:hover {
+  content: url('../images/sendIconHover.svg');
+  transform: scale(0.8);
+}
+
+.send-icon.disable {
+  cursor: default;
+  content: url('../images/sendIconDisable.svg');
+  transform: scale(0.8);
 }
 
 .gantt-chart-container {
