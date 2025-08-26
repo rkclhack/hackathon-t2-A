@@ -24,6 +24,7 @@ const tasks = reactive([])
 const isDragging = ref(false)
 const draggedMessage = ref(null)
 const isDebugVisible = ref(true)
+const messageDisplayRef = ref(null)
 const isSendDisable = computed(() => {
   return chatContent.value.trim() === "";
 });
@@ -34,6 +35,8 @@ onMounted(() => {
   registerSocketEvent()
   // 入室時にサーバーに通知してデータを同期
   socket.emit("enterEvent", { name: userName.value })
+  // 初期表示時に一番下にスクロール
+  scrollToBottom()
 })
 // #endregion
 
@@ -52,6 +55,8 @@ const onPublish = () => {
   })
   // 入力欄を初期化
   chatContent.value = ""
+  // 送信後に自動スクロール
+  scrollToBottom()
 }
 
 // 退室メッセージをサーバに送信する
@@ -109,9 +114,19 @@ const onReceiveExit = (data) => {
   chatList.unshift(message)
 }
 
+// メッセージリストを一番下にスクロールする
+const scrollToBottom = () => {
+  if (messageDisplayRef.value) {
+    setTimeout(() => {
+      messageDisplayRef.value.scrollTop = messageDisplayRef.value.scrollHeight
+    }, 100)
+  }
+}
+
 // サーバから受信したメッセージ配列を更新する
 const onReceivePublish = (data) => {
   messages.splice(0, messages.length, ...data)
+  scrollToBottom()
 }
 
 // サーバから受信したタスク配列を更新する
@@ -229,7 +244,7 @@ const handleTaskUpdate = (taskData, action) => {
   <Header />
   <div class="app-layout">
     <div class="chat-container">
-      <div class="message-display">
+      <div class="message-display" ref="messageDisplayRef">
         <div class="mt-5">
           <div class="messages-list">
             <div v-for="message in messages" :key="message.id"
