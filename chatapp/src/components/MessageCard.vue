@@ -40,7 +40,6 @@
   position: relative;
   display: flex;
   align-items: stretch;
-  max-width: min(560px, 70%);
   min-height: 60px;
   background: #F9F6E8; 
   border-radius: 4px;
