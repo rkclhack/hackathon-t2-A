@@ -113,21 +113,19 @@ const registerSocketEvent = () => {
 .app-layout {
   display: flex;
   font-family: 'Instrument Sans';
-  height: 90vh;
-  width: 100vw;
+  height: 83vh;
 }
 
 .chat-container {
   flex: 1;
   flex-direction: column;
   display: flex;
-  height: 90vh;
+  height: 83vh;
 }
 
 .message-display {
   flex: 1;
   height: 65vh;
-  width: 40vw;
 }
 
 .message-input {
@@ -143,7 +141,7 @@ const registerSocketEvent = () => {
   border-radius: 10px;
   border-color: #DDE2E9;
   font-family: 'Instrument Sans';
-  font-size: 24px;
+  font-size: 16px;
   color: #584B73;
   resize: vertical;
   display: flex;
@@ -156,6 +154,7 @@ const registerSocketEvent = () => {
 }
 
 .message-textarea::placeholder {
+  font-size: 24px;
   color: #DDE2E9;
 }
 
@@ -170,8 +169,8 @@ const registerSocketEvent = () => {
 .gantt-chart-container {
   border-left: solid 2px;
   border-color: #DDE2E9;
-  height: 90vh;
-  width: 60vw;
+  height: 83vh;
+  flex: 1.5;
 }
 
 .link {
