@@ -289,8 +289,8 @@ const handleTaskUpdate = (taskData, action) => {
          @dragover.prevent
          @drop="onDrop">
       <!-- ドロップゾーン表示 -->
-      <div v-if="isDragging" class="drop-zone">
-        <p>メッセージをタスクとして追加</p>
+      <div v-if="isDragging && tasks.length >= 1" class="drop-zone">
+        <p>メッセージをドラッグ&ドロップしてここに追加</p>
       </div>
       
       <!-- ガントチャート -->
