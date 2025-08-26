@@ -3,6 +3,7 @@ import { inject, ref, reactive, onMounted, computed } from "vue"
 import socketManager from '../socketManager.js'
 import Header from './Header.vue'
 import MessageCard from './MessageCard.vue'
+import { GANTT_CONFIG } from '../constants/gantt.js'
 
 // #region global state
 const userName = inject("userName")
@@ -17,6 +18,9 @@ const chatContent = ref("")
 const chatList = reactive([])
 const users = reactive([])
 const messages = reactive([])
+const tasks = reactive([])
+const isDragging = ref(false)
+const draggedMessage = ref(null)
 const isSendDisable = computed(() => {
   return chatContent.value.trim() === "";
 });
@@ -60,6 +64,34 @@ const onMemo = () => {
   // 入力欄を初期化
   chatContent.value = ""
 }
+
+// ドラッグ開始
+const onDragStart = (message) => {
+  isDragging.value = true
+  draggedMessage.value = message
+}
+
+// ドラッグ終了
+const onDragEnd = () => {
+  isDragging.value = false
+  draggedMessage.value = null
+}
+
+// ドロップ処理
+const onDrop = (event) => {
+  event.preventDefault()
+  if (draggedMessage.value) {
+    // registerTaskイベントを発火
+    socket.emit("registerTask", {
+      messageId: draggedMessage.value.id,
+      assignId: draggedMessage.value.user.id,
+      startDate: GANTT_CONFIG.MIN_START_DAY, // Day 1から開始
+      duration: GANTT_CONFIG.DEFAULT_DURATION // デフォルト期間
+    })
+  }
+  isDragging.value = false
+  draggedMessage.value = null
+}
 // #endregion
 
 // #region socket event handler
@@ -77,6 +109,11 @@ const onReceiveExit = (data) => {
 // サーバから受信したメッセージ配列を更新する
 const onReceivePublish = (data) => {
   messages.splice(0, messages.length, ...data)
+}
+
+// サーバから受信したタスク配列を更新する
+const onReceiveRegisterTask = (data) => {
+  tasks.splice(0, tasks.length, ...data)
 }
 // #endregion
 
@@ -97,6 +134,16 @@ const registerSocketEvent = () => {
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
   })
+
+  // タスク登録イベントを受け取ったら実行
+  socket.on("registerTask", (data) => {
+    onReceiveRegisterTask(data)
+  })
+}
+
+// メッセージがタスクに登録済みかチェック
+const isMessageInTasks = (messageId) => {
+  return tasks.some(task => task.messageId === messageId)
 }
 // #endregion
 </script>
@@ -110,16 +157,23 @@ const registerSocketEvent = () => {
           <div class="messages-list">
             <div v-for="message in messages" :key="message.id"
               :class="message.user.name === userName ? 'message-wrapper mine' : 'message-wrapper theirs'">
-              <MessageCard 
-                :message="{
-                  id: message.id,
-                  userName: message.user.name,
-                  message: message.message,
-                  sendAt: message.sendAt,
-                  color: message.user.color
-                }" 
-                :mine="message.user.name === userName" 
-              />
+              <div 
+                :draggable="!isMessageInTasks(message.id)"
+                :class="{ 'task-registered': isMessageInTasks(message.id) }"
+                @dragstart="onDragStart(message)"
+                @dragend="onDragEnd"
+              >
+                <MessageCard 
+                  :message="{
+                    id: message.id,
+                    userName: message.user.name,
+                    message: message.message,
+                    sendAt: message.sendAt,
+                    color: message.user.color
+                  }" 
+                  :mine="message.user.name === userName" 
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -139,7 +193,14 @@ const registerSocketEvent = () => {
       </div>
     </div>
 
-    <div class="gantt-chart-container">
+    <div class="gantt-chart-container"
+         @dragover.prevent
+         @drop="onDrop">
+      <!-- ドロップゾーン表示 -->
+      <div v-if="isDragging" class="drop-zone">
+        <p>メッセージをタスクとして追加</p>
+      </div>
+      
       <!-- デバッグ用表示 -->
       <div class="debug-panel">
         <h3>Debug Info</h3>
@@ -150,6 +211,10 @@ const registerSocketEvent = () => {
         <div class="debug-section">
           <h4>Messages ({{ messages.length }})</h4>
           <pre class="debug-json">{{ JSON.stringify(messages, null, 2) }}</pre>
+        </div>
+        <div class="debug-section">
+          <h4>Tasks ({{ tasks.length }})</h4>
+          <pre class="debug-json">{{ JSON.stringify(tasks, null, 2) }}</pre>
         </div>
       </div>
     </div>
@@ -252,6 +317,7 @@ const registerSocketEvent = () => {
   border-color: #DDE2E9;
   height: 83vh;
   flex: 1.5;
+  position: relative;
 }
 
 .link {
@@ -313,5 +379,32 @@ const registerSocketEvent = () => {
   overflow-y: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.task-registered {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.drop-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(51, 7, 138, 0.1);
+  border: 2px dashed #33078A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.drop-zone p {
+  font-size: 18px;
+  color: #33078A;
+  font-weight: bold;
+  margin: 0;
 }
 </style>

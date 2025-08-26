@@ -28,6 +28,7 @@ export default (io, socket) => {
     // 入室したユーザーに既存のデータを送信
     socket.emit("enterEvent", users)
     socket.emit("publishEvent", messages)
+    socket.emit("registerTask", tasks)
     
     // 他のユーザーにユーザー情報を送信
     socket.broadcast.emit("enterEvent", users)
@@ -155,7 +156,7 @@ class Task {
   #messageId;
   /** @type {User} 担当者 */
   #assignee;
-  /** @type {string} 開始日 */
+  /** @type {number} 開始日 (1=Day 1, 2=Day 2, ..., 7=Day 7) */
   #startDate;
   /** @type {number} 期間 */
   #duration;
