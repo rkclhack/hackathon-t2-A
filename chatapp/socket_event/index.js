@@ -5,7 +5,7 @@ const messages = [];
 /** @type {Task[]} */
 let tasks = [];
 
-const colors = [
+const colorPalette = [
   "#C81717",
   "#FF9A00",
   "#008E74",
@@ -23,6 +23,7 @@ export default (io, socket) => {
       enterUser = new User(data.name)
       users.push(enterUser)
     }
+    console.log(JSON.stringify(users));
     socket.broadcast.emit("enterEvent", users)
   })
 
@@ -33,8 +34,8 @@ export default (io, socket) => {
 
   // 投稿メッセージを送信する
   socket.on("publishEvent", (data) => {
-    userId = userNameToId(data.name)
-    messages.push(new Message(data.message, userId, data.sendAt))
+    const sendUser = userNameToObject(data.name)
+    messages.push(new Message(data.message, sendUser, data.sendAt))
     io.sockets.emit("publishEvent", messages)
   })
 
@@ -63,15 +64,14 @@ export default (io, socket) => {
 /**
  * 
  * @param {string} name 
- * @returns {string}
+ * @returns {User}
  */
-function userNameToId(name){
-  const user = users.find(user => user.getName() === name);
-  return user.getId();
+function userNameToObject(name){
+  const targetUser = users.find(user => user.getName() === name);
+  return targetUser;
 }
 
-// 1スタートに統一
-let nowColor = 1;
+let nowColor = 0;
 let nowUserId = 1;
 
 class User {
@@ -80,17 +80,15 @@ class User {
   /** @type {string} ユーザー名 */
   #name;
   /** @type {number} カラーID */
-  #colorId;
+  #color;
 
   /**
-   * @param {number} id - ユーザーID
-   * @param {string} name - ユーザー名
-   * @param {number} colorId - カラーID
+   * @param {string} name
    */
   constructor(name) {
     this.#id = nowUserId++;
     this.#name = name;
-    this.#colorId = nowColor++;
+    this.#color = colorPalette[(nowColor++)%5];
   }
 
   /** JSON化用 */
@@ -98,7 +96,7 @@ class User {
     return {
       id: this.#id,
       name: this.#name,
-      colorId: this.#colorId
+      color: this.#color
     };
   }
   /**
@@ -128,11 +126,10 @@ class Message {
   /** @type {string} 送信時刻 Vue.js側で設定 */
   #sendAt;
 
-  constructor(message, userId, sendAt) {
+  constructor(message, user, sendAt) {
     this.#id = nowMessageId++;
     this.#message = message;
-    
-    this.#user = userId;
+    this.#user = user;
     this.#sendAt = sendAt;
   }
 
@@ -150,8 +147,8 @@ class Message {
 class Task {
   /** @type {number} 元のメッセージID */
   #messageId;
-  /** @type {string} 担当者 */
-  #assigneeId;
+  /** @type {User} 担当者 */
+  #assignee;
   /** @type {string} 開始日 */
   #startDate;
   /** @type {number} 期間 */
@@ -161,7 +158,8 @@ class Task {
 
   constructor(obj) {
     this.#messageId = obj.messageId;
-    this.#assigneeId = obj.assigneeId;
+    const assignUser = users.find(user=>user.getId()===obj.assignId);
+    this.#assignee = assignUser;
     this.#startDate = obj.startDate;
     this.#duration = obj.duration;
     this.#isDone = false;
@@ -170,18 +168,19 @@ class Task {
   toJSON() {
     return {
       messageId: this.#messageId,
-      assigneeId: this.#assigneeId,
+      assignee: this.#assignee,
       startDate: this.#startDate,
       duration: this.#duration,
       isDone: this.#isDone
     };
   }
-  update(data){
-    this.#messageId = data.messageId
-    this.#assigneeId = data.assigneeId
-    this.#startDate = data.startDate
-    this.#duration = data.duration
-    this.#isDone = data.isDone
+  update(obj){
+    this.#messageId = obj.messageId
+    const assignUser = users.find(user=>user.getId()===obj.assignId);
+    this.#assignee = assignUser;
+    this.#startDate = obj.startDate
+    this.#duration = obj.duration
+    this.#isDone = obj.isDone
   }
   /**
    * @returns {string}
