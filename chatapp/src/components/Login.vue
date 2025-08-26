@@ -38,21 +38,72 @@ const onEnter = () => {
 </script>
 
 <template>
-  <div class="mx-auto my-5 px-4">
-    <h1 class="text-h3 font-weight-medium">Vue.js Chat サンプル</h1>
-    <div class="mt-10">
-      <p>ユーザー名</p>
-      <input type="text" v-model="inputUserName" class="user-name-text" />
+  <div class="container">
+    <div>
+    <h1 class="title">アプリ名</h1>
+    <p class="subtitle">チャットとタスクが同時にできる開発の必需品</p>
+    <div class="">
     </div>
-    <button type="button" @click="onEnter" class="button-normal">入室する</button>
+      <p class="">すぐに始めよう</p>
+      <input type="text" v-model="inputUserName" class="user-name-text" placeholder="enter your name"/>
+    </div>
+    <button type="button" @click="onEnter" class="send_alt_button">login</button>
   </div>
 </template>
 
 <style scoped>
+
+p{
+  margin-bottom: 10px;
+}
+
+.container{
+  align-items: center;
+  text-align: center;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family:Arial, Helvetica, sans-serif
+}
+
+.title{
+  font-size: 80px;
+  margin-bottom: 10px;
+}
+.subtitle{
+  margin-bottom: 50px;
+}
+
 .user-name-text {
-  width: 200px;
+  display: block;
+  margin: 0 auto;
+  width: 400px;
+  height: 30px;
   border: 1px solid #888;
+  border-radius: 4px;
   margin-bottom: 16px;
+  padding-left: 12px;
+  font-size: 16px;
+}
+.user-name-text:focus{
+  outline: 1px solid #33078A;
+}
+.send_alt_button{
+  display: block;
+  margin: 0 auto;
+  width: 70px;
+  height: 40px;
+  color:#33078A;
+  background-color: white;
+  border: 1px solid #33078A;
+  border-radius: 4px;
+  font-size: 18px;
+  font-style: "Instrument Sans";
+}
+.send_alt_button:hover{
+  background-color: #33078A;
+  color: white;
 }
 
 </style>
