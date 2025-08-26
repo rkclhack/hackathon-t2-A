@@ -21,6 +21,7 @@ const messages = reactive([])
 const tasks = reactive([])
 const isDragging = ref(false)
 const draggedMessage = ref(null)
+const isDebugVisible = ref(true)
 const isSendDisable = computed(() => {
   return chatContent.value.trim() === "";
 });
@@ -201,24 +202,36 @@ const isMessageInTasks = (messageId) => {
         <p>メッセージをタスクとして追加</p>
       </div>
       
-      <!-- デバッグ用表示 -->
-      <div class="debug-panel">
-        <h3>Debug Info</h3>
-        <div class="debug-section">
-          <h4>Users ({{ users.length }})</h4>
-          <pre class="debug-json">{{ JSON.stringify(users, null, 2) }}</pre>
-        </div>
-        <div class="debug-section">
-          <h4>Messages ({{ messages.length }})</h4>
-          <pre class="debug-json">{{ JSON.stringify(messages, null, 2) }}</pre>
-        </div>
-        <div class="debug-section">
-          <h4>Tasks ({{ tasks.length }})</h4>
-          <pre class="debug-json">{{ JSON.stringify(tasks, null, 2) }}</pre>
-        </div>
+      <!-- ここにガントチャートが実装される -->
+    </div>
+  </div>
+
+  <!-- フローティングデバッグパネル -->
+  <div v-if="isDebugVisible" class="debug-floating-panel">
+    <div class="debug-header">
+      <h3>Debug Info</h3>
+      <button @click="isDebugVisible = false" class="debug-close-btn">×</button>
+    </div>
+    <div class="debug-content">
+      <div class="debug-section">
+        <h4>Users ({{ users.length }})</h4>
+        <pre class="debug-json">{{ JSON.stringify(users, null, 2) }}</pre>
+      </div>
+      <div class="debug-section">
+        <h4>Messages ({{ messages.length }})</h4>
+        <pre class="debug-json">{{ JSON.stringify(messages, null, 2) }}</pre>
+      </div>
+      <div class="debug-section">
+        <h4>Tasks ({{ tasks.length }})</h4>
+        <pre class="debug-json">{{ JSON.stringify(tasks, null, 2) }}</pre>
       </div>
     </div>
   </div>
+
+  <!-- デバッグパネル再表示ボタン -->
+  <button v-if="!isDebugVisible" @click="isDebugVisible = true" class="debug-toggle-btn">
+    Debug
+  </button>
 </template>
 
 <style scoped>
@@ -343,42 +356,98 @@ const isMessageInTasks = (messageId) => {
   margin-top: 8px;
 }
 
-.debug-panel {
-  padding: 16px;
-  height: 100%;
-  overflow-y: auto;
-  background-color: #f5f5f5;
+.debug-floating-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 400px;
+  max-height: 500px;
+  background-color: rgba(245, 245, 245, 0.95);
+  border: 2px solid #ddd;
+  border-radius: 8px;
   font-family: monospace;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
-.debug-panel h3 {
-  margin: 0 0 16px 0;
+.debug-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: rgba(51, 7, 138, 0.1);
+  border-bottom: 1px solid #ddd;
+  border-radius: 6px 6px 0 0;
+}
+
+.debug-header h3 {
+  margin: 0;
   color: #333;
-  font-size: 18px;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 8px;
+  font-size: 16px;
+}
+
+.debug-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.debug-close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.debug-content {
+  padding: 16px;
+  max-height: 420px;
+  overflow-y: auto;
 }
 
 .debug-section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .debug-section h4 {
   margin: 0 0 8px 0;
   color: #666;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .debug-json {
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 4px;
-  padding: 12px;
-  font-size: 12px;
-  max-height: 300px;
+  padding: 10px;
+  font-size: 11px;
+  max-height: 150px;
   overflow-y: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.debug-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #33078A;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: background-color 0.2s;
+}
+
+.debug-toggle-btn:hover {
+  background-color: #4a1a9e;
 }
 
 .task-registered {
