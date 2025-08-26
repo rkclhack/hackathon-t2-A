@@ -1,6 +1,7 @@
 <script setup>
 import { inject, ref, reactive, onMounted } from "vue"
 import socketManager from '../socketManager.js'
+import Header from './Header.vue'
 
 // #region global state
 const userName = inject("userName")
@@ -86,6 +87,7 @@ const registerSocketEvent = () => {
 </script>
 
 <template>
+  <Header />
   <div class="app-layout">
     <div class="chat-container">
       <div class="message-display">
@@ -93,14 +95,10 @@ const registerSocketEvent = () => {
           <ul>
             <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
           </ul>
-      </div>
-
+        </div>
       </div>
       <div class="message-input">
-        <textarea 
-          v-model="chatContent"
-          placeholder="Type a message"
-          class="message-textarea">
+        <textarea v-model="chatContent" placeholder="Type a message" class="message-textarea">
         </textarea>
         <button class="submit-button" @click="onPublish">投稿</button>
       </div>
@@ -112,36 +110,41 @@ const registerSocketEvent = () => {
 </template>
 
 <style scoped>
-.app-layout{
+.app-layout {
   display: flex;
   font-family: 'Instrument Sans';
-  height:90vh;
+  height: 90vh;
+  width: 100vw;
 }
-.chat-container{
+
+.chat-container {
   flex: 1;
   flex-direction: column;
   display: flex;
   height: 90vh;
 }
-.message-display{
+
+.message-display {
   flex: 1;
   height: 65vh;
   width: 40vw;
 }
-.message-input{
+
+.message-input {
   display: flex;
   border-top: solid 3px;
   border-color: #DDE2E9;
   bottom: 0;
   padding: 16px;
 }
-.message-textarea{
+
+.message-textarea {
   border: solid 2px;
   border-radius: 10px;
   border-color: #DDE2E9;
   font-family: 'Instrument Sans';
   font-size: 24px;
-  color:#584B73;
+  color: #584B73;
   resize: vertical;
   display: flex;
   margin-right: 16px;
@@ -151,13 +154,16 @@ const registerSocketEvent = () => {
   field-sizing: content;
   width: 80%;
 }
-.message-textarea::placeholder{
+
+.message-textarea::placeholder {
   color: #DDE2E9;
 }
-.message-textarea:focus{
+
+.message-textarea:focus {
   outline-color: #584B73;
 }
-.submit-button{
+
+.submit-button {
   flex: 1;
 }
 
