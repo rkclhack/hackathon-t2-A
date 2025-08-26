@@ -2,6 +2,7 @@
 import { inject, ref, reactive, onMounted, computed } from "vue"
 import socketManager from '../socketManager.js'
 import Header from './Header.vue'
+import MessageCard from './MessageCard.vue'
 
 // #region global state
 const userName = inject("userName")
@@ -17,6 +18,31 @@ const chatList = reactive([])
 const isSendDisable = computed(() => {
   return chatContent.value.trim() === "";
 });
+
+// ダミーデータ（UI確認用）
+const dummyMessages = [
+  {
+    id: 1,
+    userName: "田中太郎",
+    message: "こんにちは！今日は良い天気ですね。",
+    sendAt: "14:30",
+    color: "#FF6B6B"
+  },
+  {
+    id: 2,
+    userName: userName.value || "自分",
+    message: "はい、本当に良い天気です！",
+    sendAt: "14:31",
+    color: "#4ECDC4"
+  },
+  {
+    id: 3,
+    userName: "佐藤花子",
+    message: "明日も晴れるといいですね。",
+    sendAt: "14:32",
+    color: "#45B7D1"
+  }
+]
 // #endregion
 
 // #region lifecycle
@@ -97,7 +123,18 @@ const registerSocketEvent = () => {
   <div class="app-layout">
     <div class="chat-container">
       <div class="message-display">
-        <div class="mt-5" v-if="chatList.length !== 0">
+        <!-- UI確認用のダミーメッセージ -->
+        <div class="mt-5">
+          <div class="messages-list">
+            <div v-for="message in dummyMessages" :key="message.id"
+              :class="message.userName === (userName || '自分') ? 'message-wrapper mine' : 'message-wrapper theirs'">
+              <MessageCard :message="message" :mine="message.userName === (userName || '自分')" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 実際のチャットメッセージ（現在は非表示） -->
+        <div class="mt-5" v-if="chatList.length !== 0" style="display: none;">
           <ul>
             <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
           </ul>
@@ -133,6 +170,27 @@ const registerSocketEvent = () => {
 .message-display {
   flex: 1;
   height: 65vh;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.message-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.message-wrapper.theirs {
+  justify-content: flex-start;
+}
+
+.message-wrapper.mine {
+  justify-content: flex-end;
 }
 
 .message-input {
