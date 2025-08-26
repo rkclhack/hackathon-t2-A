@@ -20,29 +20,7 @@ const isSendDisable = computed(() => {
 });
 
 // ダミーデータ（UI確認用）
-const dummyMessages = [
-  {
-    id: 1,
-    userName: "田中太郎",
-    message: "こんにちは！今日は良い天気ですね。",
-    sendAt: "14:30",
-    color: "#FF6B6B"
-  },
-  {
-    id: 2,
-    userName: userName.value || "自分",
-    message: "はい、本当に良い天気です！",
-    sendAt: "14:31",
-    color: "#4ECDC4"
-  },
-  {
-    id: 3,
-    userName: "佐藤花子",
-    message: "明日も晴れるといいですね。",
-    sendAt: "14:32",
-    color: "#45B7D1"
-  }
-]
+const messages = []
 // #endregion
 
 // #region lifecycle
@@ -81,19 +59,19 @@ const onMemo = () => {
 // サーバから受信した入室メッセージ画面上に表示する
 const onReceiveEnter = (data) => {
   const message = `${data.name}さんが入室しました。`
-  chatList.unshift(message)
+  chatList.unshift(messages)
 }
 
 // サーバから受信した退室メッセージを受け取り画面上に表示する
 const onReceiveExit = (data) => {
   const message = `${data.name}さんが退室しました。`
-  chatList.unshift(message)
+  chatList.unshift(messages)
 }
 
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
-  const message = `${data.name}さん:${data.message}`
-  chatList.unshift(message)
+  messages = data
+  console.log(JSON.stringify(data))
 }
 // #endregion
 
@@ -126,17 +104,18 @@ const registerSocketEvent = () => {
         <!-- UI確認用のダミーメッセージ -->
         <div class="mt-5">
           <div class="messages-list">
-            <div v-for="message in dummyMessages" :key="message.id"
-              :class="message.userName === (userName || '自分') ? 'message-wrapper mine' : 'message-wrapper theirs'">
-              <MessageCard :message="message" :mine="message.userName === (userName || '自分')" />
+            <div v-for="message in messages" :key="message.id"
+              :class="message.user.name === (userName) ? 'message-wrapper mine' : 'message-wrapper theirs'">
+              <MessageCard :message="message" :mine="message.user.name === (userName)" />
             </div>
           </div>
         </div>
 
         <!-- 実際のチャットメッセージ（現在は非表示） -->
-        <div class="mt-5" v-if="chatList.length !== 0" style="display: none;">
+        <div class="mt-5" v-if="chatList.length !== 0">
           <ul>
-            <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
+            <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat}}</li>
+            <MessageCard />
           </ul>
         </div>
       </div>
