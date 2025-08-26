@@ -3,6 +3,7 @@ import { inject, ref, reactive, onMounted, computed } from "vue"
 import socketManager from '../socketManager.js'
 import Header from './Header.vue'
 import MessageCard from './MessageCard.vue'
+import ColorPalette from './ColorPalette.vue'
 
 // #region global state
 const userName = inject("userName")
@@ -18,6 +19,7 @@ const chatList = reactive([])
 const isSendDisable = computed(() => {
   return chatContent.value.trim() === "";
 });
+const selectedColor = ref("#FF6B6B")
 
 // ダミーデータ（UI確認用）
 const dummyMessages = [
@@ -42,6 +44,11 @@ const dummyMessages = [
     sendAt: "14:32",
     color: "#45B7D1"
   }
+]
+
+// ColorPalette用のダミーデータ
+const colorOptions = [
+  "#C81717", "#FF9A00", "#008E74", "#33078A", "#67078A"
 ]
 // #endregion
 
@@ -149,6 +156,13 @@ const registerSocketEvent = () => {
     </div>
 
     <div class="gantt-chart-container">
+      <ColorPalette 
+        :colors="colorOptions" 
+        v-model="selectedColor"
+        size="md"
+        :allow-clear="true"
+        label="Choose your color"
+      />
     </div>
   </div>
 </template>
@@ -249,6 +263,12 @@ const registerSocketEvent = () => {
   border-color: #DDE2E9;
   height: 83vh;
   flex: 1.5;
+}
+
+.color-palette-demo {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .link {
