@@ -3,6 +3,7 @@ import { inject, ref, reactive, onMounted, computed } from "vue"
 import socketManager from '../socketManager.js'
 import Header from './Header.vue'
 import MessageCard from './MessageCard.vue'
+import ColorPalette from './ColorPalette.vue'
 import GanttChart from './GanttChart.vue'
 import { GANTT_CONFIG } from '../constants/gantt.js'
 
@@ -26,6 +27,12 @@ const isDebugVisible = ref(true)
 const isSendDisable = computed(() => {
   return chatContent.value.trim() === "";
 });
+const selectedColor = ref("#FF6B6B")
+
+// ColorPalette用のダミーデータ
+const colorOptions = [
+  "#C81717", "#FF9A00", "#008E74", "#33078A", "#67078A"
+]
 // #endregion
 
 // #region lifecycle
@@ -308,6 +315,13 @@ const handleTaskUpdate = (taskData, action) => {
         <h4>Tasks ({{ tasks.length }})</h4>
         <pre class="debug-json">{{ JSON.stringify(tasks, null, 2) }}</pre>
       </div>
+      <ColorPalette 
+        :colors="colorOptions" 
+        v-model="selectedColor"
+        size="md"
+        :allow-clear="true"
+        label="Choose your color"
+      />
     </div>
   </div>
 
@@ -415,6 +429,12 @@ const handleTaskUpdate = (taskData, action) => {
   flex: 1.5;
   position: relative;
   overflow-x: auto;
+}
+
+.color-palette-demo {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .link {
