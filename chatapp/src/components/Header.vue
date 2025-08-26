@@ -13,7 +13,7 @@ const logout = () => {
 
 <template>
     <header class="header">
-        <img src="../images/user-solid.svg" alt="logo" class="logo">
+        <img src="../images/logo.png" alt="logo" class="logo">
         <p v-if="userName !== ''" class="greeting">こんにちは、{{ userName }}さん</p>
         <button v-if="userName !== ''" @click="logout" class="logout-button">logout</button>
     </header>
@@ -24,7 +24,7 @@ const logout = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 5px;
     background-color: #fefeff;
     border-bottom: 3px solid #dde2e9;
 }
@@ -33,10 +33,11 @@ const logout = () => {
     margin: 0;
     flex-grow: 1;
     text-align: left;
-    padding-left: 100px;
+    padding-left: 10px;
 }
 .logo {
-    width: 20px;
+    width: 60px;
+    height: 60px
 }
 .logout-button {
     font-size: 20px;
