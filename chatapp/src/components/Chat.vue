@@ -1,6 +1,7 @@
 <script setup>
 import { inject, ref, reactive, onMounted } from "vue"
 import socketManager from '../socketManager.js'
+import Header from './Header.vue'
 
 // #region global state
 const userName = inject("userName")
@@ -86,24 +87,27 @@ const registerSocketEvent = () => {
 </script>
 
 <template>
-  <div class="mx-auto my-5 px-4">
-    <h1 class="text-h3 font-weight-medium">Vue.js Chat チャットルーム</h1>
-    <div class="mt-10">
-      <p>ログインユーザ：{{ userName }}さん</p>
-      <textarea v-model="chatContent" variant="outlined" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>
-      <div class="mt-5">
-        <button class="button-normal" @click="onPublish">投稿</button>
-        <button class="button-normal util-ml-8px" @click="onMemo">メモ</button>
+  <div>
+    <Header />
+    <div class="mx-auto my-5 px-4">
+      <h1 class="text-h3 font-weight-medium">Vue.js Chat チャットルーム</h1>
+      <div class="mt-10">
+        <p>ログインユーザ：{{ userName }}さん</p>
+        <textarea variant="outlined" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>
+        <div class="mt-5">
+          <button class="button-normal">投稿</button>
+          <button class="button-normal util-ml-8px">メモ</button>
+        </div>
+        <div class="mt-5" v-if="chatList.length !== 0">
+          <ul>
+            <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
+          </ul>
+        </div>
       </div>
-      <div class="mt-5" v-if="chatList.length !== 0">
-        <ul>
-          <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
-        </ul>
-      </div>
+      <router-link to="/" class="link">
+        <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
+      </router-link>
     </div>
-    <router-link to="/" class="link">
-      <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
-    </router-link>
   </div>
 </template>
 
