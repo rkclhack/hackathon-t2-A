@@ -87,31 +87,92 @@ const registerSocketEvent = () => {
 </script>
 
 <template>
-  <div>
-    <Header />
-    <div class="mx-auto my-5 px-4">
-      <h1 class="text-h3 font-weight-medium">Vue.js Chat チャットルーム</h1>
-      <div class="mt-10">
-        <p>ログインユーザ：{{ userName }}さん</p>
-        <textarea variant="outlined" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>
-        <div class="mt-5">
-          <button class="button-normal">投稿</button>
-          <button class="button-normal util-ml-8px">メモ</button>
-        </div>
+  <Header />
+  <div class="app-layout">
+    <div class="chat-container">
+      <div class="message-display">
         <div class="mt-5" v-if="chatList.length !== 0">
           <ul>
             <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
           </ul>
         </div>
       </div>
-      <router-link to="/" class="link">
-        <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
-      </router-link>
+      <div class="message-input">
+        <textarea v-model="chatContent" placeholder="Type a message" class="message-textarea">
+        </textarea>
+        <button class="submit-button" @click="onPublish">投稿</button>
+      </div>
+    </div>
+
+    <div class="gantt-chart-container">
     </div>
   </div>
 </template>
 
 <style scoped>
+.app-layout {
+  display: flex;
+  font-family: 'Instrument Sans';
+  height: 83vh;
+}
+
+.chat-container {
+  flex: 1;
+  flex-direction: column;
+  display: flex;
+  height: 83vh;
+}
+
+.message-display {
+  flex: 1;
+  height: 65vh;
+}
+
+.message-input {
+  display: flex;
+  border-top: solid 3px;
+  border-color: #DDE2E9;
+  bottom: 0;
+  padding: 16px;
+}
+
+.message-textarea {
+  border: solid 2px;
+  border-radius: 10px;
+  border-color: #DDE2E9;
+  font-family: 'Instrument Sans';
+  font-size: 16px;
+  color: #584B73;
+  resize: vertical;
+  display: flex;
+  margin-right: 16px;
+  min-height: 50px;
+  max-height: 80px;
+  overflow-y: auto;
+  field-sizing: content;
+  width: 80%;
+}
+
+.message-textarea::placeholder {
+  font-size: 24px;
+  color: #DDE2E9;
+}
+
+.message-textarea:focus {
+  outline-color: #584B73;
+}
+
+.submit-button {
+  flex: 1;
+}
+
+.gantt-chart-container {
+  border-left: solid 2px;
+  border-color: #DDE2E9;
+  height: 83vh;
+  flex: 1.5;
+}
+
 .link {
   text-decoration: none;
 }
