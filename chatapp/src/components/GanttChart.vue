@@ -529,7 +529,7 @@ onUnmounted(() => {
   top: 50%;
   transform: translateY(-50%);
   width: 12px;
-  height: 24px;
+  height: 28px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
   cursor: ew-resize;
