@@ -2,6 +2,7 @@
 import { inject, ref } from "vue"
 import { useRouter } from "vue-router"
 import socketManager from '../socketManager.js'
+import Header from './Header.vue'
 
 // #region global state
 const userName = inject("userName")
@@ -38,6 +39,8 @@ const onEnter = () => {
 </script>
 
 <template>
+  <Header />
+  <img src="../images/chat-screen.png"></img>
   <div class="container">
     <div>
     <h1 class="title">アプリ名</h1>
@@ -57,11 +60,24 @@ p{
   margin-bottom: 10px;
 }
 
+img{
+  position: fixed;     
+  top: 0;
+  left: 0;
+  width: 100vw;        
+  height: 100vh;        
+  object-fit: cover;   
+  opacity: 0.5;         
+  z-index: -1;          
+  user-select: none;
+  pointer-events: none;
+}
+
 .container{
   align-items: center;
   text-align: center;
   position: absolute;
-  top: 40%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-family:Arial, Helvetica, sans-serif
