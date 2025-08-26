@@ -3,6 +3,7 @@ import { inject, ref, reactive, onMounted, computed } from "vue"
 import socketManager from '../socketManager.js'
 import Header from './Header.vue'
 import MessageCard from './MessageCard.vue'
+import GanttChart from './GanttChart.vue'
 import { GANTT_CONFIG } from '../constants/gantt.js'
 
 // #region global state
@@ -116,6 +117,16 @@ const onReceivePublish = (data) => {
 const onReceiveRegisterTask = (data) => {
   tasks.splice(0, tasks.length, ...data)
 }
+
+// サーバから受信したタスク削除を処理する
+const onReceiveDeleteTask = (data) => {
+  tasks.splice(0, tasks.length, ...data)
+}
+
+// サーバから受信したタスク更新を処理する
+const onReceiveUpdateTask = (data) => {
+  tasks.splice(0, tasks.length, ...data)
+}
 // #endregion
 
 // #region local methods
@@ -140,11 +151,75 @@ const registerSocketEvent = () => {
   socket.on("registerTask", (data) => {
     onReceiveRegisterTask(data)
   })
+
+  // タスク削除イベントを受け取ったら実行
+  socket.on("deleteTask", (data) => {
+    onReceiveDeleteTask(data)
+  })
+
+  // タスク更新イベントを受け取ったら実行
+  socket.on("updateTask", (data) => {
+    onReceiveUpdateTask(data)
+  })
 }
 
 // メッセージがタスクに登録済みかチェック
 const isMessageInTasks = (messageId) => {
   return tasks.some(task => task.messageId === messageId)
+}
+
+// tasksとmessagesを結合した計算プロパティ
+const ganttTasks = computed(() => {
+  return tasks.map(task => {
+    const message = messages.find(msg => msg.id === task.messageId)
+    return {
+      id: task.messageId,
+      messageId: task.messageId,
+      message: message ? message.message : 'Unknown message',
+      assignee: task.assignee,
+      startDate: task.startDate,
+      duration: task.duration,
+      isDone: task.isDone
+    }
+  })
+})
+
+// ガントチャートでのタスク更新処理
+const handleTaskUpdate = (taskData, action) => {
+  
+  switch (action) {
+    case 'delete':
+
+      socket.emit("deleteTask", { messageId: taskData.messageId })
+      break
+    case 'position':
+    case 'duration':
+    case 'completed':
+
+      socket.emit("updateTask", {
+        messageId: taskData.messageId,
+        assignId: taskData.assignee.id,
+        startDate: taskData.startDate,
+        duration: taskData.duration,
+        isDone: taskData.isDone
+      })
+      break
+    case 'color':
+      // 色に対応するユーザーIDを見つける
+      const userWithColor = users.find(user => user.color === taskData.assignee.color)
+
+      if (userWithColor) {
+
+        socket.emit("updateTask", {
+          messageId: taskData.messageId,
+          assignId: userWithColor.id,
+          startDate: taskData.startDate,
+          duration: taskData.duration,
+          isDone: taskData.isDone
+        })
+      }
+      break
+  }
 }
 // #endregion
 </script>
@@ -202,7 +277,15 @@ const isMessageInTasks = (messageId) => {
         <p>メッセージをタスクとして追加</p>
       </div>
       
-      <!-- ここにガントチャートが実装される -->
+      <!-- ガントチャート -->
+      <GanttChart 
+        :tasks="ganttTasks"
+        :users="users"
+        :on-task-update="handleTaskUpdate"
+      />
+      
+      <!-- デバッグ情報 -->
+      
     </div>
   </div>
 
@@ -331,6 +414,7 @@ const isMessageInTasks = (messageId) => {
   height: 83vh;
   flex: 1.5;
   position: relative;
+  overflow-x: auto;
 }
 
 .link {

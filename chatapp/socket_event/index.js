@@ -56,15 +56,17 @@ export default (io, socket) => {
   // タスクを削除
   // in: messageId
   socket.on("deleteTask", (data) => {
-    tasks = tasks.filter(task=>task.getId()===data.messageId);
+    tasks = tasks.filter(task=>task.getId()!=data.messageId);
     io.sockets.emit("deleteTask", tasks)
   })
 
   // タスク内容を変更
   socket.on("updateTask", (data) => {
-    const targetTask = tasks.filter(task=>task.getId()===data.messageId)[0];
-    targetTask.update(data);
-    io.sockets.emit("changeAsignee", tasks);
+    const targetTask = tasks.find(task=>task.getId()==data.messageId);
+    if (targetTask) {
+      targetTask.update(data);
+      io.sockets.emit("updateTask", tasks);
+    }
   })
 }
 
@@ -165,7 +167,7 @@ class Task {
 
   constructor(obj) {
     this.#messageId = obj.messageId;
-    const assignUser = users.find(user=>user.getId()===obj.assignId);
+    const assignUser = users.find(user=>user.getId()==obj.assignId);
     this.#assignee = assignUser;
     this.#startDate = obj.startDate;
     this.#duration = obj.duration;
@@ -183,8 +185,10 @@ class Task {
   }
   update(obj){
     this.#messageId = obj.messageId
-    const assignUser = users.find(user=>user.getId()===obj.assignId);
-    this.#assignee = assignUser;
+    const assignUser = users.find(user=>user.getId()==obj.assignId);
+    if (assignUser) {
+      this.#assignee = assignUser;
+    }
     this.#startDate = obj.startDate
     this.#duration = obj.duration
     this.#isDone = obj.isDone
