@@ -74,36 +74,35 @@
 
 /* ===== 影のカスタマイズ（hover時のみ） ===== */
 /* 相手（左側に糊）→ 右側3分の1に影 */
-  .theirs:hover::after {
+  /* .theirs:hover::after {
     content: "";
     position: absolute;
     top: 0;
     right: 0;
-    width: 33.33%; /* 右側3分の1 */
-    height: 100%;
+    width: 33.33%;
+    height: 90%;
     background: rgba(0,0,0,0.20);
     filter: blur(10px);
     z-index: -1;
     transform: translateX(8px) translateY(10px);
     border-radius: 4px;
     transition: transform 1.0s ease;
-  }
+  } */
 
   /* 自分（右側に糊）→ 左側3分の1に影 */
-  .mine:hover::after {
+  /* .mine:hover::after {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
-    width: 33.33%; /* 左側3分の1 */
-    height: 100%;
+    width: 33.33%;
+    height: 90%;
     background: rgba(0,0,0,0.20);
     filter: blur(10px);
-    z-index: -1;
     transform: translateX(-8px) translateY(10px);
     border-radius: 4px;
-    transition: transform 1.0s ease;
-  }
+    transition: transform 1.5s;
+  } */
 
   .body{
     flex: 1;
@@ -112,7 +111,7 @@
   }
   .row{ display:flex; align-items:baseline; gap:10px; }
   .author{ font-weight: 700; }
-  .time{ font-size: 11px; color:#DDE2E9; }
+  .time{ font-size: 11px; color:#888; }
   .content{ margin-top: 6px; line-height:1.55; color:#584B73; }
   
   /* 影 */

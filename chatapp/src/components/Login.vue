@@ -43,7 +43,7 @@ const onEnter = () => {
   <img src="../images/chat-screen.png" class="chat-screen"></img>
   <div class="container">
     <div>
-    <h1 class="title">アプリ名</h1>
+    <h1 class="title">Gantt Chat</h1>
     <p class="subtitle">チャットとタスクが同時にできる開発の必需品</p>
     <div class="">
     </div>
@@ -80,7 +80,6 @@ p{
   top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family:Arial, Helvetica, sans-serif
 }
 
 .title{
