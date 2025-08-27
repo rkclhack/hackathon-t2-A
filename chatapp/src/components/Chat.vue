@@ -375,10 +375,11 @@ const handleTaskUpdate = (taskData, action) => {
 
 .message-input {
   display: flex;
+  align-items: center;
   border-top: solid 3px;
   border-color: #DDE2E9;
   bottom: 0;
-  padding: 16px;
+  padding: 4px;
 }
 
 .message-textarea {
@@ -386,13 +387,13 @@ const handleTaskUpdate = (taskData, action) => {
   border-radius: 10px;
   border-color: #DDE2E9;
   font-family: 'Instrument Sans';
-  font-size: 16px;
+  font-size: 20px;
   color: #584B73;
   resize: vertical;
   display: flex;
-  margin-right: 16px;
-  min-height: 50px;
-  max-height: 80px;
+  margin-right: 12px;
+  min-height: 40px;
+  max-height: 50px;
   overflow-y: auto;
   field-sizing: content;
   width: 80%;
@@ -401,6 +402,7 @@ const handleTaskUpdate = (taskData, action) => {
 .message-textarea::placeholder {
   font-size: 24px;
   color: #DDE2E9;
+  
 }
 
 .message-textarea:focus {
