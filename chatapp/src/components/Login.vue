@@ -48,7 +48,7 @@ const onEnter = () => {
     <div class="">
     </div>
       <p class="">すぐに始めよう</p>
-      <input type="text" v-model="inputUserName" class="user-name-text" placeholder="enter your name"/>
+      <input type="text" v-model="inputUserName" @keyup.enter="onEnter" class="user-name-text" placeholder="enter your name"/>
     </div>
     <button type="button" @click="onEnter" class="send_alt_button">login</button>
   </div>
