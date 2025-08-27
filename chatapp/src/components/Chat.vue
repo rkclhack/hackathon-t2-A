@@ -6,6 +6,9 @@ import MessageCard from './MessageCard.vue'
 import ColorPalette from './ColorPalette.vue'
 import GanttChart from './GanttChart.vue'
 import { GANTT_CONFIG } from '../constants/gantt.js'
+import { useRouter } from "vue-router"
+
+const router = useRouter()
 
 // #region global state
 const userName = inject("userName")
@@ -41,6 +44,11 @@ onMounted(() => {
 // #endregion
 
 // #region browser event handler
+// 最大人数でエラーが返ってきた時
+const onReceiveError = (data) => {
+  router.push({ name: "login" })
+  alert(data)
+}
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
   if (isSendDisable.value) {
@@ -176,6 +184,11 @@ const registerSocketEvent = () => {
   // タスク更新イベントを受け取ったら実行
   socket.on("updateTask", (data) => {
     onReceiveUpdateTask(data)
+  })
+
+  // 入室エラーイベントを受け取ったら実行
+  socket.on("enterError", (data) => {
+    onReceiveError(data)
   })
 }
 
