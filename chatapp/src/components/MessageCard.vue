@@ -13,12 +13,20 @@
   
   // ユーザーごとのストリップ色
   const stripColor = props.message.color || "#FF9A00"
+
+  // ドラッグ開始時の処理
+  const handleDragStart = (event) => {
+    event.dataTransfer.setData('text/plain', JSON.stringify(props.message))
+    event.dataTransfer.effectAllowed = 'copy'
+  }
   </script>
 
 <template>
     <article
       class="sticky-msg"
       :class="mine ? 'mine' : 'theirs'"
+      draggable="true"
+      @dragstart="handleDragStart"
     >
       <div class="strip" :style="{ backgroundColor: stripColor }"></div>
   
@@ -40,11 +48,21 @@
   position: relative;
   display: flex;
   align-items: stretch;
-  max-width: min(560px, 70%);
   min-height: 60px;
   background: #F9F6E8; 
   border-radius: 4px;
   margin: 10px 0;
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sticky-msg:active {
+  cursor: grabbing;
+}
+
+.sticky-msg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 /* ===== ストリップ部分 ===== */
 .strip {
