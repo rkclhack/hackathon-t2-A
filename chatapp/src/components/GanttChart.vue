@@ -346,7 +346,7 @@ onUnmounted(() => {
 }
 
 .task-row:last-child .task-checkbox-cell::after {
-  height: calc(100% + 25px);
+  height: calc(100% + 50px);
 }
 
 .day-cell {
@@ -380,7 +380,7 @@ onUnmounted(() => {
 }
 
 .task-row:last-child .day-cell:not(:last-child)::after {
-  height: calc(100% + 25px);
+  height: calc(100% + 50px);
 }
 
 .task-bar-segment {
