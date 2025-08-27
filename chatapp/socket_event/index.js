@@ -5,6 +5,8 @@ const messages = [];
 /** @type {Task[]} */
 let tasks = [];
 
+const MAX_USERS = 5;
+
 const colorPalette = [
   "#C81717",
   "#FF9A00",
@@ -20,8 +22,16 @@ export default (io, socket) => {
     /** @type {User} */
     let enterUser = users.find(user=>user.getName()===data.name);
     if(typeof enterUser === "undefined"){
-      enterUser = new User(data.name)
-      users.push(enterUser)
+      if(users.length>=MAX_USERS){
+        let userListText = "入室者一覧\n";
+        for(const user of users){
+          userListText += user.getName() + "\n";
+        }
+        socket.emit("enterError","最大で5人までです\n"+userListText);
+      }else{
+        enterUser = new User(data.name);
+        users.push(enterUser);
+      }
     }
     console.log(JSON.stringify(users));
     
