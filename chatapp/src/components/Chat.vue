@@ -337,14 +337,14 @@ const handleTaskUpdate = (taskData, action) => {
 .app-layout {
   display: flex;
   font-family: 'Instrument Sans';
-  height: 83vh;
+  height: calc(100vh - 83px);
 }
 
 .chat-container {
   flex: 1;
   flex-direction: column;
   display: flex;
-  height: 83vh;
+  height: calc(100vh - 83px);
 }
 
 .message-display {
@@ -427,7 +427,7 @@ const handleTaskUpdate = (taskData, action) => {
 .gantt-chart-container {
   border-left: solid 2px;
   border-color: #DDE2E9;
-  height: 83vh;
+  height: calc(100vh - 83px);
   flex: 1.5;
   position: relative;
   overflow-x: auto;
